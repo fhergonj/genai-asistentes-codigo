@@ -1,0 +1,287 @@
+---
+description: Guía para testear aplicaciones FastAPI modernas con pytest y mejores prácticas
+globs: test_*.py, *_test.py, tests/**/*.py
+alwaysApply: false
+---
+
+# Testing de Aplicaciones FastAPI
+
+Guía completa para escribir tests modernos y robustos para aplicaciones FastAPI.
+
+## Estructura de Tests
+
+### Organización con Clases
+
+```python
+# ✅ GOOD: Organizar tests en clases por funcionalidad
+class TestListEmployees:
+    """Tests para listar empleados."""
+    
+    def test_list_empty_employees(self, client):
+        response = client.get("/employees")
+        assert response.status_code == 200
+        assert response.json() == []
+
+class TestCreateEmployee:
+    """Tests para crear empleados."""
+    
+    def test_create_employee_success(self, client):
+        # ...
+```
+
+### Fixtures Esenciales
+
+```python
+import pytest
+from fastapi.testclient import TestClient
+from main import app
+
+@pytest.fixture
+def client():
+    """Cliente de prueba para la API."""
+    return TestClient(app)
+
+@pytest.fixture(autouse=True)
+def reset_db():
+    """Reinicia la base de datos antes de cada test."""
+    # Setup
+    db.clear()
+    yield
+    # Teardown (opcional)
+```
+
+## Tests Síncronos con TestClient
+
+### Tests Básicos de Endpoints
+
+```python
+# ✅ GOOD: Tests claros con assertions específicos
+def test_get_endpoint_success(client):
+    response = client.get("/items")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+
+def test_get_item_by_id(client):
+    response = client.get("/items/1")
+    assert response.status_code == 200
+    assert response.json()["id"] == 1
+```
+
+### Tests de Creación (POST)
+
+```python
+# ✅ GOOD: Verificar status code y datos retornados
+def test_create_item_success(client):
+    payload = {
+        "name": "Test Item",
+        "description": "Test description"
+    }
+    response = client.post("/items", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["name"] == "Test Item"
+    assert "id" in data
+```
+
+### Tests de Validación (422)
+
+```python
+# ✅ GOOD: Verificar que Pydantic rechaza datos inválidos
+def test_create_item_invalid_data(client):
+    payload = {
+        "name": "",  # ❌ Vacío
+        "description": "Test"
+    }
+    response = client.post("/items", json=payload)
+    assert response.status_code == 422
+    errors = response.json()["detail"]
+    assert any("name" in str(err).lower() for err in errors)
+```
+
+### Tests de Errores (404, 400)
+
+```python
+# ✅ GOOD: Verificar manejo de errores
+def test_get_nonexistent_item(client):
+    response = client.get("/items/999")
+    assert response.status_code == 404
+    assert "no encontrado" in response.json()["detail"].lower()
+
+def test_create_item_invalid_relation(client):
+    payload = {
+        "name": "Test",
+        "category_id": 999  # ❌ Categoría inexistente
+    }
+    response = client.post("/items", json=payload)
+    assert response.status_code == 400
+```
+
+### Tests de Actualización (PUT/PATCH)
+
+```python
+# ✅ GOOD: Verificar actualización parcial y completa
+def test_update_item_success(client):
+    # Crear item primero
+    item = create_test_item()
+    
+    payload = {"name": "Updated Name"}
+    response = client.put(f"/items/{item.id}", json=payload)
+    assert response.status_code == 200
+    assert response.json()["name"] == "Updated Name"
+
+def test_update_nonexistent_item(client):
+    response = client.put("/items/999", json={"name": "Test"})
+    assert response.status_code == 404
+```
+
+### Tests de Eliminación (DELETE)
+
+```python
+# ✅ GOOD: Verificar eliminación y estado posterior
+def test_delete_item_success(client):
+    item = create_test_item()
+    
+    response = client.delete(f"/items/{item.id}")
+    assert response.status_code == 204
+    
+    # Verificar que fue eliminado
+    response = client.get(f"/items/{item.id}")
+    assert response.status_code == 404
+```
+
+## Tests Asíncronos con AsyncClient
+
+Para endpoints async, usa `httpx.AsyncClient`:
+
+```python
+import pytest
+from httpx import AsyncClient
+from main import app
+
+@pytest.fixture
+async def async_client():
+    """Cliente async para tests."""
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
+
+@pytest.mark.asyncio
+async def test_async_endpoint(async_client):
+    response = await async_client.get("/async-items")
+    assert response.status_code == 200
+```
+
+## Tests de OpenAPI
+
+```python
+# ✅ GOOD: Verificar documentación automática
+class TestOpenAPI:
+    def test_openapi_schema(self, client):
+        response = client.get("/openapi.json")
+        assert response.status_code == 200
+        schema = response.json()
+        assert schema["openapi"] == "3.1.0"
+        assert "paths" in schema
+
+    def test_api_docs_available(self, client):
+        response = client.get("/docs")
+        assert response.status_code == 200
+        assert "html" in response.headers["content-type"]
+```
+
+## Mejores Prácticas
+
+### 1. Nombres Descriptivos
+
+```python
+# ✅ GOOD
+def test_create_employee_with_invalid_email_returns_422(client):
+    # ...
+
+# ❌ BAD
+def test_create(client):
+    # ...
+```
+
+### 2. Un Assertion por Concepto
+
+```python
+# ✅ GOOD: Assertions claros y específicos
+def test_get_employee(client):
+    response = client.get("/employees/1")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == 1
+    assert data["email"] == "test@example.com"
+    assert "company" in data
+```
+
+### 3. Fixtures para Datos de Prueba
+
+```python
+# ✅ GOOD: Reutilizar datos de prueba
+@pytest.fixture
+def sample_company():
+    return db.create_company("Test Corp", "Technology")
+
+def test_create_employee_with_company(client, sample_company):
+    payload = {
+        "name": "Test",
+        "company_id": sample_company.id
+    }
+    response = client.post("/employees", json=payload)
+    assert response.status_code == 201
+```
+
+### 4. Verificar Normalización
+
+```python
+# ✅ GOOD: Verificar que los validadores funcionan
+def test_email_normalized_to_lowercase(client):
+    payload = {"email": "TEST@EXAMPLE.COM"}
+    response = client.post("/users", json=payload)
+    assert response.status_code == 201
+    assert response.json()["email"] == "test@example.com"
+```
+
+### 5. Tests de Headers y Autenticación
+
+```python
+# ✅ GOOD: Verificar headers y autenticación
+def test_protected_endpoint_requires_auth(client):
+    response = client.get("/protected")
+    assert response.status_code == 401
+
+def test_protected_endpoint_with_token(client):
+    headers = {"Authorization": "Bearer valid-token"}
+    response = client.get("/protected", headers=headers)
+    assert response.status_code == 200
+```
+
+## Ejecución de Tests
+
+```bash
+# Tests básicos
+pytest test_api.py -v
+
+# Con reporte de cobertura
+pytest test_api.py --cov=. --cov-report=html
+
+# Tests específicos
+pytest test_api.py::TestCreateEmployee::test_create_employee_success -v
+
+# Tests async
+pytest test_api.py -v --asyncio-mode=auto
+```
+
+## Checklist de Testing
+
+- [ ] Tests organizados en clases por funcionalidad
+- [ ] Fixtures para `client` y setup/teardown
+- [ ] Tests de endpoints exitosos (200, 201, 204)
+- [ ] Tests de validación (422)
+- [ ] Tests de errores (404, 400, 401)
+- [ ] Tests de OpenAPI
+- [ ] Nombres descriptivos en tests
+- [ ] Assertions específicos y claros
+- [ ] Cobertura de casos edge (vacíos, nulos, límites)

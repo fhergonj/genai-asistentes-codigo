@@ -1,0 +1,8 @@
+[project]
+name = "fastapi-helloworld"
+version = "1.0.0"
+description = "Proyecto FastAPI minimalista con endpoints básicos"
+requires-python = ">=3.13.5"
+dependencies = [
+    "fastapi[standard]>=0.128.0",
+]

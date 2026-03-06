@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+Ten en cuenta que para este proyecto usamos el gestor de dependencias de python llamado uv, con el intérprete Python 3.13.5

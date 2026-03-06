@@ -1,0 +1,29 @@
+---
+description: Stack tecnológico del proyecto - FastAPI, uv y Python
+alwaysApply: true
+---
+
+# Stack Tecnológico
+
+Este proyecto utiliza el siguiente stack:
+
+## Tecnologías
+
+- **FastAPI**: Versión 0.128.0
+- **Gestor de dependencias**: uv
+- **Python**: Versión 3.13
+
+## Iniciar la aplicación
+
+Para iniciar el proyecto o aplicación FastAPI, utiliza el comando:
+
+```bash
+fastapi dev <archivo_principal>
+```
+
+Por ejemplo:
+```bash
+fastapi dev main.py
+```
+
+Este comando inicia el servidor de desarrollo de FastAPI con recarga automática.

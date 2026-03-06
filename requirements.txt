@@ -1,0 +1,7 @@
+# principales jupyter en vscode:
+jupyter
+ipykernel
+nbformat
+nbconvert
+
+fastapi[standard]

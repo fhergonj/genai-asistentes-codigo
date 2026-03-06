@@ -1,0 +1,82 @@
+from fastapi import FastAPI, HTTPException
+from sqlmodel import SQLModel, create_engine, Session, select
+from typing import List
+
+# Database setup
+DATABASE_URL = "sqlite:///./database.db"
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+# Models
+class {{EntityName}}(SQLModel, table=True):
+    id: int | None = None
+    {{fields}}
+
+class {{EntityName}}Create(SQLModel):
+    {{fields_create}}
+
+class {{EntityName}}Update(SQLModel):
+    {{fields_update}}
+
+# FastAPI app
+app = FastAPI(title="{{API_Title}}")
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+
+# CRUD Endpoints
+@app.get("/{{entity_plural}}", response_model=List[{{EntityName}}])
+def list_{{entity_plural}}():
+    with Session(engine) as session:
+        {{entity_plural}} = session.exec(select({{EntityName}})).all()
+        return {{entity_plural}}
+
+@app.get("/{{entity_plural}}/{id}", response_model={{EntityName}})
+def get_{{entity}}(id: int):
+    with Session(engine) as session:
+        {{entity}} = session.get({{EntityName}}, id)
+        if not {{entity}}:
+            raise HTTPException(status_code=404, detail="Not found")
+        return {{entity}}
+
+@app.post("/{{entity_plural}}", response_model={{EntityName}})
+def create_{{entity}}({{entity}}_data: {{EntityName}}Create):
+    {{entity}} = {{EntityName}}.from_orm({{entity}}_data)
+    with Session(engine) as session:
+        session.add({{entity}})
+        session.commit()
+        session.refresh({{entity}})
+        return {{entity}}
+
+@app.put("/{{entity_plural}}/{id}", response_model={{EntityName}})
+def update_{{entity}}(id: int, {{entity}}_data: {{EntityName}}Update):
+    with Session(engine) as session:
+        {{entity}} = session.get({{EntityName}}, id)
+        if not {{entity}}:
+            raise HTTPException(status_code=404, detail="Not found")
+
+        update_data = {{entity}}_data.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr({{entity}}, key, value)
+
+        session.add({{entity}})
+        session.commit()
+        session.refresh({{entity}})
+        return {{entity}}
+
+@app.delete("/{{entity_plural}}/{id}")
+def delete_{{entity}}(id: int):
+    with Session(engine) as session:
+        {{entity}} = session.get({{EntityName}}, id)
+        if not {{entity}}:
+            raise HTTPException(status_code=404, detail="Not found")
+        session.delete({{entity}})
+        session.commit()
+        return {"message": "Deleted successfully"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
