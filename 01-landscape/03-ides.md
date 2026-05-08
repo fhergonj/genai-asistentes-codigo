@@ -1,0 +1,55 @@
+Autor: Alan Sastre
+
+GitHub: [github.com/alansastre/genai-asistentes-codigo](https://github.com/alansastre/genai-asistentes-codigo)
+
+Los **IDEs con IA nativa** son editores de código que integran funcionalidades de inteligencia artificial directamente en su arquitectura, en lugar de depender de extensiones externas. La mayoría están basados en Visual Studio Code, lo que permite una **transición sencilla** para desarrolladores familiarizados con ese entorno.
+
+En la práctica, la diferencia funcional con las extensiones avanzadas como GitHub Copilot se ha reducido considerablemente. Extensiones modernas ofrecen chat contextual, modo agente y edición multi-archivo. Lo que distingue a los IDEs nativos es la **experiencia visual integrada**: diffs en tiempo real, layouts específicos para agentes y flujos de trabajo optimizados para revisar cambios generados por IA.
+
+## Panorama de IDEs con IA nativa
+
+El mercado de IDEs con IA integrada ha crecido de forma acelerada desde 2023. Todos comparten la base de VS Code, lo que significa compatibilidad con extensiones existentes, atajos de teclado familiares y configuraciones reutilizables. La diferencia está en cómo integran las funcionalidades de IA, qué **modelos tienen disponibles** y los detalles de la interfaz de usuario.
+
+| IDE | Desarrollador | Lanzamiento | Innovación distintiva |
+|-----|---------------|-------------|----------------------|
+| [Cursor](https://cursor.com) | Anysphere | Marzo 2023 | Diffs visuales inline y Tab predictivo |
+| [Windsurf](https://windsurf.com/editor) | Codeium | Noviembre 2024 | AI Flows y agente Cascade |
+| [Trae](https://trae.ai) | ByteDance | Enero 2025 | Builder mode gratuito con Claude y GPT-4o |
+| [Kiro](https://kiro.dev/) | AWS | Julio 2025 | Desarrollo guiado por especificaciones |
+| [Google Antigravity](https://antigravity.google/) | Google | Noviembre 2025 | Manager Surface para orquestar múltiples agentes |
+
+### Cursor
+
+**Cursor** fue el pionero del mercado. Desarrollado por Anysphere, se lanzó en **marzo de 2023** y rápidamente se convirtió en el referente de esta categoría. En agosto de 2024 cerró una ronda Serie A de 60 millones de dólares, y en 2025 alcanzó una valoración de 9.900 millones con más de 500 millones en ingresos anuales.
+
+Su innovación principal fue el **diff visual inline**: cuando el modelo genera código, Cursor muestra los cambios directamente en el editor con un formato que permite aceptar o rechazar cada modificación. También popularizó el **Tab predictivo**, que anticipa la siguiente acción del desarrollador y permite aceptarla con una sola tecla. Estas características definieron el estándar que otros IDEs han adoptado posteriormente.
+
+### Windsurf
+
+**Windsurf** es el IDE de Codeium, lanzado el **13 de noviembre de 2024**. Codeium ya ofrecía una extensión de autocompletado gratuita, pero con Windsurf apostó por un producto completo que posteriormente se convirtió en la marca principal de la empresa.
+
+Su propuesta diferencial fue el concepto de **AI Flows**, que combina copilot y agente en un flujo continuo. El agente **Cascade** proporciona asistencia en tiempo real sin necesidad de definir tareas manualmente; observa el contexto y sugiere acciones de forma proactiva. El editor también incluye funcionalidades de preview y despliegue integrado para ver los resultados sin salir del IDE.
+
+### Trae
+
+**Trae** es el IDE de ByteDance (empresa matriz de TikTok). La versión internacional se lanzó en **enero de 2025**, seguida de la versión china en marzo del mismo año.
+
+La característica que lo distingue es su **modelo de negocio gratuito** con acceso a modelos potentes como Claude 3.5 Sonnet y GPT-4o en la versión internacional, o Doubao-1.5-Pro y DeepSeek R1 en la versión china. Incluye un **Builder mode** que genera aplicaciones completas a partir de descripciones en lenguaje natural, y soporte nativo para MCP (Model Context Protocol). La estrategia de ByteDance parece enfocada en captar cuota de mercado ofreciendo funcionalidades premium sin coste.
+
+### Kiro
+
+**Kiro** es el IDE de AWS, lanzado en preview en **julio de 2025** y disponible de forma general desde el **17 de noviembre de 2025**.
+
+Su enfoque es el **desarrollo guiado por especificaciones** (spec-driven development). A diferencia de otros IDEs que generan código directamente, Kiro primero crea especificaciones detalladas con requisitos, diseño estructurado y tareas de implementación validadas por tests. Esta aproximación busca reducir el problema del "vibe coding" donde el desarrollador acepta código sin entenderlo completamente. Incluye también steering files para configurar el comportamiento del agente a nivel de equipo y property-based testing para validar que el código generado cumple las especificaciones.
+
+### Google Antigravity
+
+**Google Antigravity** se anunció el **18 de noviembre de 2025** junto con el lanzamiento de Gemini 3. Actualmente está en preview público gratuito.
+
+Su innovación principal es la arquitectura **agent-first** con una superficie dedicada llamada **Manager Surface**. Esta interfaz permite orquestar múltiples agentes que trabajan de forma autónoma en el editor, terminal y navegador. El desarrollador puede delegar tareas completas y observar el progreso de forma asíncrona mediante artifacts visuales como capturas de pantalla y walkthroughs. Está impulsado principalmente por Gemini 3 Pro, aunque soporta otros modelos como Claude Sonnet 4.5.
+
+## Convergencia funcional
+
+Todos estos IDEs ofrecen funcionalidades muy similares: autocompletado predictivo, chat contextual, modo agente con edición multi-archivo, integración con múltiples proveedores de modelos y soporte para MCP. Las diferencias se encuentran principalmente en **detalles de la interfaz**, precios, modelos incluidos por defecto y pequeñas variaciones en los flujos de trabajo.
+
+La elección entre uno u otro depende más de preferencias personales, integración con servicios existentes (AWS para Kiro, ecosistema Google para Antigravity) o consideraciones económicas (Trae gratuito vs suscripciones de pago) que de diferencias funcionales significativas.
